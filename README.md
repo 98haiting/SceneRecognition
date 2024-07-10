@@ -14,7 +14,7 @@ Following libraries are required:
 ## Results
 To eliminate the gap between real artworks and photographic images, we applied artistic style transfer technique first.
 The results of the style transfer are shown below:
-![Fig 1: Examples of artistic style-transferred](imgs/examples of style-transferred Places365.png)
+![Fig 1: Examples of artistic style-transferred](imgs/examples%20of%20style-transferred%20Places365.png)
 
 The results of the scene classification after fine-tuning are shown below:
 ![Tab 1: Results of scene classification with fine-tuning](imgs/topk%20accuracies%20of%20finetuning.png)
