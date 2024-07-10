@@ -26,7 +26,7 @@ def parse_args():
     This function is to define some arguments for the model
     :return: properties about training the model
     """
-    parser = argparse.ArgumentParser(description='Pytorch Places365 Retraining on Pre-trained model')
+    parser = argparse.ArgumentParser(description='Pytorch Places365 Retraining on SWAG model')
     parser.add_argument('--model', type=str, default='vit_h14', help='model to retrain (default: vit_h14_in1k)')
     parser.add_argument('--workers', default=4, type=int, help='number of data loading workers (default: 4)')
     parser.add_argument('--batch_size', type=int, default=64, metavar='Batch size',
@@ -51,7 +51,6 @@ def parse_args():
     parser.add_argument('--momentum', type=float, default=0.9, help='SGD momentum (default: 0.9)')
     parser.add_argument('--seed', type=int, default=123, help='random seed (default: 1)')
     parser.add_argument('--save-model', action='store_true', default=True, help='For Saving the current Model')
-    # checkpoint path: "./previous_checkpoints/checkpoints/....pkl"
     parser.add_argument('--checkpoints', action='store_true', default=False, help='whether to load the checkpoint')
     parser.add_argument('--stylized', action='store_true', default=False, help='train with stylized images')
     parser.add_argument('--checkpoint_path', type=str, default=None, help='path to the checkpoint')
@@ -139,7 +138,7 @@ def main_worker(gpu, args):
         optimizer = torch.optim.SGD(params=model.parameters(), lr=args.lr, momentum=args.momentum)
 
     else:
-        dataset = './Artplace_train.csv'
+        dataset = './Artplace_train_new.csv'
         challengeDataset_train_val = pd.read_csv(dataset)
         challengeDataset_train, challengeDateset_val = train_test_split(challengeDataset_train_val, test_size=0.2)
 
@@ -178,20 +177,14 @@ def main_worker(gpu, args):
     dist.barrier()
     # running configuration
     if not args.prediction:
-        if not args.k:
-            print("training configuration")
-            trainer = Trainer(model=model, train_data=train_dataloader, val_data=val_dataloader, criterion=criterion,
-                              optimizer=optimizer, early_stop=5, args=args, device=device)
-            print("start training")
-            tok1, tok5, loss = trainer.fit(epochs=args.epochs)
-        else:
-            kf = KFold(n_splits=10)
-            score = cross_val_score(model, train_samples, cv=kf)
-            print(f"k-fold validation score: {score}")
+        print("training configuration")
+        trainer = Trainer(model=model, train_data=train_dataloader, val_data=val_dataloader, criterion=criterion,
+                          optimizer=optimizer, early_stop=5, args=args, device=device)
+        print("start training")
+        tok1, tok5, loss = trainer.fit(epochs=args.epochs)
 
-    # testdir = './image-level-labels - labels.csv'
     testdir_ODOR = os.path.join('./data', 'Artwork1.csv')
-    testdir_Art = './Artplace_test_corrected.csv'
+    testdir_Art = './Artplace_test_new_corrected.csv'
 
     # challengeDataset_test = pd.read_csv(testdir)  # DataFrame with all the info
     challengeDataset_test_ODOR = pd.read_csv(testdir_ODOR)
